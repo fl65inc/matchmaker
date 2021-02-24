@@ -46,15 +46,20 @@ parser.add_argument('--gpu-support', default=True,
 
 parser.add_argument('--saved-model-name', default="matchmaker.h5",
                     help='Model name to save weights')
+parser.add_argument('--output_prefix', default="matchmaker.h5",
+                    help='Prefix to save the prediction files by.')
 args = parser.parse_args()
 # ---------------------------------------------------------- #
+output_prefix = args.output_prefix
 num_cores = 8
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_devices
 GPU = True
 if args.gpu_support:
+    print(f'Switching on GPU support!: {args.gpu_devices}, {GPU}')
     num_GPU = 1
     num_CPU = 1
 else:
+    print('No GPU support!')
     num_CPU = 2
     num_GPU = 0
 
@@ -113,8 +118,8 @@ pred1 = MatchMaker.predict(model, [test_data['drug1'],test_data['drug2']])
 mse_value = performance_metrics.mse(test_data['y'], pred1)
 spearman_value = performance_metrics.spearman(test_data['y'], pred1)
 pearson_value = performance_metrics.pearson(test_data['y'], pred1)
-np.savetxt("pred1.txt", np.asarray(pred1), delimiter=",")
-np.savetxt("y_test.txt", np.asarray(test_data['y']), delimiter=",")
+np.savetxt(f"{output_prefix}_pred1.txt", np.asarray(pred1), delimiter=",")
+np.savetxt(f"{output_prefix}_y_test.txt", np.asarray(test_data['y']), delimiter=",")
 # predict in Drug2, Drug1 order
 pred2 = MatchMaker.predict(model, [test_data['drug2'],test_data['drug1']])
 # take the mean for final prediction
